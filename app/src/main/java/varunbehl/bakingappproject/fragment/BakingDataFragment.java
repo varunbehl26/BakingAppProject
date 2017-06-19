@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import varunbehl.bakingappproject.MainActivity;
 import varunbehl.bakingappproject.R;
 import varunbehl.bakingappproject.adapter.StepsRecyclerViewAdapter;
@@ -20,6 +22,14 @@ public class BakingDataFragment extends Fragment {
 
 
     public static final String RECEIPE = "Receipe_Detail";
+    @BindView(R.id.receipe_name)
+    TextView receipeName;
+    @BindView(R.id.servings_name)
+    TextView servings;
+    @BindView(R.id.ing_card)
+    CardView ingCardView;
+    @BindView(R.id.reipe_step_recycle)
+    RecyclerView reipe_step_recycle;
     private BakingData bakingData;
 
     public BakingDataFragment() {
@@ -42,12 +52,9 @@ public class BakingDataFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_bakingdata_list, container, false);
-        TextView receipeName = (TextView) view.findViewById(R.id.receipe_name);
-        TextView servings = (TextView) view.findViewById(R.id.servings_name);
-        CardView ingCardView = (CardView) view.findViewById(R.id.ing_card);
 
-        RecyclerView reipe_step_recycle = (RecyclerView) view.findViewById(R.id.reipe_step_recycle);
+        View view = inflater.inflate(R.layout.fragment_bakingdata_list, container, false);
+        ButterKnife.bind(this, view);
 
         Bundle bundle;
         if (savedInstanceState == null) {

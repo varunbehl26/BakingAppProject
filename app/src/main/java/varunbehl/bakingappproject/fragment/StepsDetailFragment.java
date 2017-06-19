@@ -31,6 +31,8 @@ import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import varunbehl.bakingappproject.MainActivity;
 import varunbehl.bakingappproject.R;
 import varunbehl.bakingappproject.pojo.BakingData;
@@ -41,12 +43,15 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
     public static final String POSITION = "position";
     private static MediaSessionCompat mMediaSession;
     BakingData bakingData = null;
+    Bundle bundle;
+    @BindView(R.id.next_step_btn)
+    Button nextStepBtn;
+    @BindView(R.id.description)
+    TextView descriptionTx;
     private SimpleExoPlayerView mPlayerView;
     private SimpleExoPlayer player;
     private PlaybackStateCompat.Builder mStateBuilder;
     private int position;
-     Bundle bundle;
-
 
 
     public StepsDetailFragment() {
@@ -68,7 +73,7 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
 
         if (savedInstanceState == null) {
             bundle = this.getArguments();
-        }else{
+        } else {
             bundle = savedInstanceState.getBundle(StepsDetailFragment.class.getName());
         }
     }
@@ -77,12 +82,11 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_bak, container, false);
-        TextView descriptionTx = (TextView) view.findViewById(R.id.description);
-        Button nextStepBtn = (Button) view.findViewById(R.id.next_step_btn);
+        ButterKnife.bind(this, view);
 
         if (savedInstanceState == null) {
-          bundle = this.getArguments();
-        }else{
+            bundle = this.getArguments();
+        } else {
             bundle = savedInstanceState.getBundle(StepsDetailFragment.class.getName());
         }
 
@@ -125,10 +129,10 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
     }
 
 
-    public void releasePlayer(){
+    public void releasePlayer() {
         player.stop();
         player.release();
-        player=null;
+        player = null;
     }
 
     /**
@@ -175,7 +179,7 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
     private void initializePlayer(Uri mediaUri) {
         if (player == null) {
             // Create an instance of the ExoPlayer.
-            player = ExoPlayerFactory.newSimpleInstance(getContext(), new DefaultTrackSelector(),  new DefaultLoadControl());
+            player = ExoPlayerFactory.newSimpleInstance(getContext(), new DefaultTrackSelector(), new DefaultLoadControl());
 
             mPlayerView.setPlayer(player);
 
