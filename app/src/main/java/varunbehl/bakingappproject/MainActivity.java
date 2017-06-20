@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements BakingDataFragmen
             fragmentLayout.setVisibility(View.GONE);
             gridMain.setVisibility(View.VISIBLE);
         } else {
-            gridMain.setVisibility(View.GONE);
             containerId = (R.id.container);
         }
 
@@ -83,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements BakingDataFragmen
             fragmentLayout.setVisibility(View.VISIBLE);
             gridMain.setVisibility(View.GONE);
         } else {
-            gridMain.setVisibility(View.GONE);
             containerId = (R.id.container);
         }
         BakingDataFragment bakingDataFragment = new BakingDataFragment();
