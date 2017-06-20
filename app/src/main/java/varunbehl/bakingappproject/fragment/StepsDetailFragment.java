@@ -121,13 +121,11 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
         return view;
     }
 
-
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onStop() {
+        super.onStop();
         releasePlayer();
     }
-
 
     public void releasePlayer() {
         player.stop();

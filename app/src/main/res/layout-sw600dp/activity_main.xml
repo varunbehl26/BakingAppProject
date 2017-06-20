@@ -1,40 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    tools:context="varunbehl.bakingappproject.MainActivity">
+    android:orientation="horizontal">
 
-
-    <FrameLayout
-        android:id="@+id/master_list_fragment"
-        android:layout_width="400dp"
-        android:layout_height="match_parent" />
-
-    <View
-        android:layout_width="1dp"
-        android:layout_height="match_parent"
-        android:background="@android:color/darker_gray" />
+    <GridLayout
+        android:id="@+id/grid_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 
     <LinearLayout
-        android:id="@+id/android_me_linear_layout"
+        android:id="@+id/fragment_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:background="@android:color/white"
-        android:orientation="vertical">
-
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:context="varunbehl.bakingappproject.MainActivity">
 
         <FrameLayout
-            android:id="@+id/container"
+            android:id="@+id/master_list_fragment"
+            android:layout_width="400dp"
+            android:layout_height="match_parent" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/darker_gray" />
+
+
+        <LinearLayout
+            android:id="@+id/android_me_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            />
+            android:layout_gravity="center"
+            android:background="@android:color/white"
+            android:orientation="vertical">
+
+
+            <FrameLayout
+                android:id="@+id/container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+
+        </LinearLayout>
 
 
     </LinearLayout>
-
-
-</LinearLayout>
+</RelativeLayout>

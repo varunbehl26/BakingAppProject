@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
+
 import java.util.List;
 
 import varunbehl.bakingappproject.MainActivity;
@@ -35,7 +37,7 @@ public class ReceipeRecyclerViewAdapter extends RecyclerView.Adapter<ReceipeRecy
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.receipe_name.setText(mValues.get(position).getName());
-
+        holder.draweeView.setImageURI(mValues.get(position).getImage());
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -57,11 +59,15 @@ public class ReceipeRecyclerViewAdapter extends RecyclerView.Adapter<ReceipeRecy
         public final View mView;
         public final TextView receipe_name;
         public BakingData mItem;
+        SimpleDraweeView draweeView;
+
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
             receipe_name = (TextView) view.findViewById(R.id.receipe_name);
+            draweeView = (SimpleDraweeView) itemView.findViewById(R.id.receipe_img);
+
         }
 
         @Override

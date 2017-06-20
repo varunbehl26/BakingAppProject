@@ -4,38 +4,50 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.GridLayout;
+import android.widget.LinearLayout;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import varunbehl.bakingappproject.fragment.BakingDataFragment;
 import varunbehl.bakingappproject.fragment.IngredientsDetailFragment;
 import varunbehl.bakingappproject.fragment.ReceipeFragment;
 import varunbehl.bakingappproject.fragment.StepsDetailFragment;
 import varunbehl.bakingappproject.pojo.BakingData;
-import varunbehl.bakingappproject.widget.ReceipeWidget;
 import varunbehl.bakingappproject.widget.ReceipeWidgetFactory;
 
 public class MainActivity extends AppCompatActivity implements BakingDataFragment.onIngredientClick, BakingDataFragment.onStepsClick {
 
+
+    LinearLayout fragmentLayout;
+    GridLayout gridMain;
+    private boolean mTwoPlane;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ButterKnife.bind(this);
         setContentView(R.layout.activity_main);
+
 
         Intent intent = getIntent();
 
         BakingData bakingData = intent.getParcelableExtra(ReceipeWidgetFactory.BAKINGDATA);
 
-        boolean mTwoPlane = findViewById(R.id.android_me_linear_layout) != null;
+        mTwoPlane = findViewById(R.id.android_me_linear_layout) != null;
+        if(mTwoPlane){
+            fragmentLayout= (LinearLayout) findViewById(R.id.fragment_layout);
+            gridMain= (GridLayout) findViewById(R.id.grid_main);
+        }
 
         if (bakingData != null) {
             onIngredientClick(bakingData, true);
         } else if (savedInstanceState == null) {
-            if (mTwoPlane) {
-                loadReceipes(R.id.master_list_fragment);
-            } else {
-                loadReceipes(R.id.container);
-            }
+            loadReceipes();
         }
     }
+
 
     @Override
     protected void onResume() {
@@ -47,14 +59,33 @@ public class MainActivity extends AppCompatActivity implements BakingDataFragmen
         super.onSaveInstanceState(bundle);
     }
 
-    private void loadReceipes(int id) {
+    private void loadReceipes() {
+        int containerId;
+        if (mTwoPlane) {
+            containerId = (R.id.grid_main);
+            fragmentLayout.setVisibility(View.GONE);
+            gridMain.setVisibility(View.VISIBLE);
+        } else {
+            gridMain.setVisibility(View.GONE);
+            containerId = (R.id.container);
+        }
+
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(id, new ReceipeFragment());
+        transaction.replace(containerId, new ReceipeFragment());
         transaction.commit();
     }
 
 
     public void loadReceipeDetail(BakingData mItem) {
+        int containerId;
+        if (mTwoPlane) {
+            containerId = (R.id.master_list_fragment);
+            fragmentLayout.setVisibility(View.VISIBLE);
+            gridMain.setVisibility(View.GONE);
+        } else {
+            gridMain.setVisibility(View.GONE);
+            containerId = (R.id.container);
+        }
         BakingDataFragment bakingDataFragment = new BakingDataFragment();
 
         Bundle bundle = new Bundle();
@@ -63,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements BakingDataFragmen
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.addToBackStack(BakingDataFragment.RECEIPE);
-        transaction.replace(R.id.container, bakingDataFragment);
+        transaction.replace(containerId, bakingDataFragment);
         transaction.commit();
     }
 
@@ -103,5 +134,14 @@ public class MainActivity extends AppCompatActivity implements BakingDataFragmen
         }
     }
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (getFragmentManager().getBackStackEntryCount() > 0) {
+            getFragmentManager().popBackStack();
+        } else {
+            loadReceipes();
+            super.onBackPressed();
+        }
+    }
 }

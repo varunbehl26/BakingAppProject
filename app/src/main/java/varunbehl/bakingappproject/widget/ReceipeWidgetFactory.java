@@ -3,6 +3,7 @@ package varunbehl.bakingappproject.widget;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
@@ -13,6 +14,7 @@ import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -64,6 +66,21 @@ public class ReceipeWidgetFactory implements RemoteViewsService.RemoteViewsFacto
         final RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget_bakingdataingredients);
         final BakingData bakingData = bakingDataList.get(position);
         rv.setTextViewText(R.id.ingredient, bakingData.getName());
+
+        try {
+            rv.setImageViewBitmap(R.id.icon, BitmapFactory.decodeStream(new URL(bakingDataList.get(position).getImage()).openConnection().getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        rv.setTextViewText(R.id.name, bakingDataList.get(position).getName());
+        rv.setTextViewText(R.id.servings, context.getString(R.string.servings) + " " + bakingDataList.get(position).getServings());
+        for (int i=0;i<bakingDataList.get(position).getIngredients().size();i++){
+            RemoteViews  ing= new RemoteViews(context.getPackageName(), R.layout.fragment_bakingdataingredients);
+            ing.setTextViewText(R.id.ingredient,bakingDataList.get(position).getIngredients().get(i).getIngredient());
+            ing.setTextViewText(R.id.measure,bakingDataList.get(position).getIngredients().get(i).getMeasure());
+            ing.setTextViewText(R.id.quantity,bakingDataList.get(position).getIngredients().get(i).getQuantity()+"");
+            rv.addView(R.id.ingerdient_list,ing);
+        }
 
         Bundle bundle = new Bundle();
         bundle.putParcelable(BAKINGDATA, bakingData);
