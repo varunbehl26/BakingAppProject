@@ -1,38 +1,43 @@
 package varunbehl.bakingappproject.widget;
 
-import android.appwidget.AppWidgetManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import varunbehl.bakingappproject.R;
 import varunbehl.bakingappproject.pojo.BakingData;
 
-public class ReceipeWidgetFactory implements RemoteViewsService.RemoteViewsFactory {
-    private final Context context;
+public class RecipeWidgetFactory implements RemoteViewsService.RemoteViewsFactory {
+    public static String BAKINGDATA = "bakingData";
+    private Context context = null;
     private List<BakingData> bakingDataList;
-    public  static String BAKINGDATA ="bakingData";
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            Bundle b = intent.getExtras();
+            bakingDataList = b.getParcelableArrayList("RecipeData");
+        }
+    };
 
-    public ReceipeWidgetFactory(Context applicationContext, Intent intent) {
+    public RecipeWidgetFactory() {
+    }
+
+
+    public RecipeWidgetFactory(Context applicationContext, Intent intent) {
         context = applicationContext;
-        int widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
-                AppWidgetManager.INVALID_APPWIDGET_ID);
         bakingDataList = new ArrayList<>();
-
+        context.registerReceiver(mMessageReceiver, new IntentFilter());
     }
 
     @Override
@@ -42,13 +47,10 @@ public class ReceipeWidgetFactory implements RemoteViewsService.RemoteViewsFacto
 
     @Override
     public void onDataSetChanged() {
-        String jsonLocation = loadJSONFromAsset();
-        Type collectionType = new TypeToken<Collection<BakingData>>() {
-        }.getType();
-        Collection<BakingData> bakingData = new Gson().fromJson(jsonLocation, collectionType);
-        bakingDataList = new ArrayList<>();
-        assert bakingData != null;
-        bakingDataList.addAll(bakingData);
+        context.registerReceiver(
+                mMessageReceiver, new IntentFilter("bcNewMessage"));
+        Intent msgIntent = new Intent(context, RecipeDataService.class);
+        context.startService(msgIntent);
     }
 
     @Override
@@ -74,12 +76,12 @@ public class ReceipeWidgetFactory implements RemoteViewsService.RemoteViewsFacto
         }
         rv.setTextViewText(R.id.name, bakingDataList.get(position).getName());
         rv.setTextViewText(R.id.servings, context.getString(R.string.servings) + " " + bakingDataList.get(position).getServings());
-        for (int i=0;i<bakingDataList.get(position).getIngredients().size();i++){
-            RemoteViews  ing= new RemoteViews(context.getPackageName(), R.layout.fragment_bakingdataingredients);
-            ing.setTextViewText(R.id.ingredient,bakingDataList.get(position).getIngredients().get(i).getIngredient());
-            ing.setTextViewText(R.id.measure,bakingDataList.get(position).getIngredients().get(i).getMeasure());
-            ing.setTextViewText(R.id.quantity,bakingDataList.get(position).getIngredients().get(i).getQuantity()+"");
-            rv.addView(R.id.ingerdient_list,ing);
+        for (int i = 0; i < bakingDataList.get(position).getIngredients().size(); i++) {
+            RemoteViews ing = new RemoteViews(context.getPackageName(), R.layout.fragment_bakingdataingredients);
+            ing.setTextViewText(R.id.ingredient, bakingDataList.get(position).getIngredients().get(i).getIngredient());
+            ing.setTextViewText(R.id.measure, bakingDataList.get(position).getIngredients().get(i).getMeasure());
+            ing.setTextViewText(R.id.quantity, bakingDataList.get(position).getIngredients().get(i).getQuantity() + "");
+            rv.addView(R.id.ingerdient_list, ing);
         }
 
         Bundle bundle = new Bundle();
@@ -114,20 +116,5 @@ public class ReceipeWidgetFactory implements RemoteViewsService.RemoteViewsFacto
         return true;
     }
 
-    private String loadJSONFromAsset() {
-        String json;
-        try {
-            InputStream is = context.getAssets().open("baking.json");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
 
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-        return json;
-    }
 }

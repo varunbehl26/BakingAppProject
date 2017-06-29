@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import varunbehl.bakingappproject.MainActivity;
 import varunbehl.bakingappproject.R;
+import varunbehl.bakingappproject.activity.MainActivity;
 import varunbehl.bakingappproject.pojo.BakingData;
 
 public class StepsRecyclerViewAdapter extends RecyclerView.Adapter<StepsRecyclerViewAdapter.ViewHolder> {

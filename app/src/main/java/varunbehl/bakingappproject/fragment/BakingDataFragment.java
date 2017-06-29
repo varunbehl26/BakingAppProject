@@ -13,17 +13,17 @@ import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import varunbehl.bakingappproject.MainActivity;
 import varunbehl.bakingappproject.R;
+import varunbehl.bakingappproject.activity.MainActivity;
 import varunbehl.bakingappproject.adapter.StepsRecyclerViewAdapter;
 import varunbehl.bakingappproject.pojo.BakingData;
 
 public class BakingDataFragment extends Fragment {
 
 
-    public static final String RECEIPE = "Receipe_Detail";
-    @BindView(R.id.receipe_name)
-    TextView receipeName;
+    public static final String Recipe = "Recipe_Detail";
+    @BindView(R.id.Recipe_name)
+    TextView RecipeName;
     @BindView(R.id.servings_name)
     TextView servings;
     @BindView(R.id.ing_card)
@@ -44,7 +44,7 @@ public class BakingDataFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Bundle bundle = new Bundle();
-        bundle.putParcelable(RECEIPE, bakingData);
+        bundle.putParcelable(Recipe, bakingData);
         outState.putBundle(BakingDataFragment.class.getName(), bundle);
     }
 
@@ -54,6 +54,10 @@ public class BakingDataFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_bakingdata_list, container, false);
+
+        ((MainActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
+        ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         ButterKnife.bind(this, view);
 
         Bundle bundle;
@@ -65,12 +69,13 @@ public class BakingDataFragment extends Fragment {
 
 
         if (bundle != null) {
-            bakingData = bundle.getParcelable(RECEIPE);
+            bakingData = bundle.getParcelable(Recipe);
         }
 
 
         if (bakingData != null && bakingData.getName() != null && !bakingData.getName().equals("")) {
-            receipeName.setText(getString(R.string.receipe) + bakingData.getName());
+            ((MainActivity) getActivity()).getSupportActionBar().setTitle(bakingData.getName());
+            RecipeName.setText(getString(R.string.Recipe) + bakingData.getName());
             servings.setText(getString(R.string.servings) + bakingData.getServings());
         }
         getActivity().setTitle(bakingData.getName());

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:fresco="http://schemas.android.com/tools"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/text_margin"
@@ -14,7 +14,7 @@
 
 
         <com.facebook.drawee.view.SimpleDraweeView
-            android:id="@+id/receipe_img"
+            android:id="@+id/Recipe_img"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_margin="@dimen/text_margin"
@@ -23,10 +23,12 @@
             fresco:placeholderImage="@drawable/placeholder" />
 
         <TextView
-            android:id="@+id/receipe_name"
+            android:id="@+id/Recipe_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_margin="@dimen/text_margin"
+            android:text="Recipe Name"
             android:textAppearance="?attr/textAppearanceListItem" />
 
     </LinearLayout>

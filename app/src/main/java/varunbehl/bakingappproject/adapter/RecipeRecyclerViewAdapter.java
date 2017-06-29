@@ -11,16 +11,16 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.List;
 
-import varunbehl.bakingappproject.MainActivity;
 import varunbehl.bakingappproject.R;
+import varunbehl.bakingappproject.activity.MainActivity;
 import varunbehl.bakingappproject.pojo.BakingData;
 
-public class ReceipeRecyclerViewAdapter extends RecyclerView.Adapter<ReceipeRecyclerViewAdapter.ViewHolder> {
+public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecyclerViewAdapter.ViewHolder> {
 
     private final List<BakingData> mValues;
     private final Context context;
 
-    public ReceipeRecyclerViewAdapter(List<BakingData> mValues, Context context) {
+    public RecipeRecyclerViewAdapter(List<BakingData> mValues, Context context) {
         this.mValues = mValues;
         this.context = context;
     }
@@ -29,19 +29,19 @@ public class ReceipeRecyclerViewAdapter extends RecyclerView.Adapter<ReceipeRecy
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.receipe_bakingdata, parent, false);
+                .inflate(R.layout.recipe_bakingdata, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.receipe_name.setText(mValues.get(position).getName());
+        holder.Recipe_name.setText(mValues.get(position).getName());
         holder.draweeView.setImageURI(mValues.get(position).getImage());
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity) context).loadReceipeDetail(holder.mItem);
+                ((MainActivity) context).loadRecipeDetail(holder.mItem);
             }
         });
     }
@@ -57,7 +57,7 @@ public class ReceipeRecyclerViewAdapter extends RecyclerView.Adapter<ReceipeRecy
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView receipe_name;
+        public final TextView Recipe_name;
         public BakingData mItem;
         SimpleDraweeView draweeView;
 
@@ -65,14 +65,14 @@ public class ReceipeRecyclerViewAdapter extends RecyclerView.Adapter<ReceipeRecy
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            receipe_name = (TextView) view.findViewById(R.id.receipe_name);
-            draweeView = (SimpleDraweeView) itemView.findViewById(R.id.receipe_img);
+            Recipe_name = (TextView) view.findViewById(R.id.Recipe_name);
+            draweeView = (SimpleDraweeView) itemView.findViewById(R.id.Recipe_img);
 
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + receipe_name.getText() + "'";
+            return super.toString() + " '" + Recipe_name.getText() + "'";
         }
     }
 }

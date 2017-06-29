@@ -10,14 +10,14 @@ import android.widget.TextView;
 import java.util.List;
 
 import varunbehl.bakingappproject.R;
-import varunbehl.bakingappproject.pojo.BakingData;
+import varunbehl.bakingappproject.pojo.Ingredient;
 
 public class IngredientsRecyclerViewAdapter extends RecyclerView.Adapter<IngredientsRecyclerViewAdapter.ViewHolder> {
 
-    private final List<BakingData.Ingredient> mValues;
+    private final List<Ingredient> mValues;
     private final Context context;
 
-    public IngredientsRecyclerViewAdapter(Context context, List<BakingData.Ingredient> ingredients) {
+    public IngredientsRecyclerViewAdapter(Context context, List<Ingredient> ingredients) {
         mValues = ingredients;
         this.context = context;
     }
@@ -32,9 +32,9 @@ public class IngredientsRecyclerViewAdapter extends RecyclerView.Adapter<Ingredi
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.ingredient.setText(context.getString(R.string.ingredient) + mValues.get(position).getIngredient());
-        holder.measure.setText(context.getString(R.string.measure) + mValues.get(position).getMeasure());
-        holder.quantity.setText(context.getString(R.string.quantity) + mValues.get(position).getQuantity().toString());
+        holder.ingredient.setText(mValues.get(position).getIngredient());
+        holder.measure.setText(mValues.get(position).getMeasure());
+        holder.quantity.setText(mValues.get(position).getQuantity().toString());
 
     }
 
@@ -48,7 +48,7 @@ public class IngredientsRecyclerViewAdapter extends RecyclerView.Adapter<Ingredi
         public final TextView ingredient;
         public final TextView quantity;
         public final TextView measure;
-        public BakingData.Ingredient mItem;
+        public Ingredient mItem;
 
         public ViewHolder(View view) {
             super(view);

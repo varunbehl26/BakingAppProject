@@ -1,24 +1,28 @@
-package varunbehl.bakingappproject;
+package varunbehl.bakingappproject.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 
-import butterknife.BindView;
+import com.facebook.drawee.backends.pipeline.Fresco;
+
 import butterknife.ButterKnife;
+import varunbehl.bakingappproject.R;
 import varunbehl.bakingappproject.fragment.BakingDataFragment;
 import varunbehl.bakingappproject.fragment.IngredientsDetailFragment;
-import varunbehl.bakingappproject.fragment.ReceipeFragment;
+import varunbehl.bakingappproject.fragment.RecipeFragment;
 import varunbehl.bakingappproject.fragment.StepsDetailFragment;
 import varunbehl.bakingappproject.pojo.BakingData;
-import varunbehl.bakingappproject.widget.ReceipeWidgetFactory;
+import varunbehl.bakingappproject.widget.RecipeDataService;
+import varunbehl.bakingappproject.widget.RecipeWidgetFactory;
 
 public class MainActivity extends AppCompatActivity implements BakingDataFragment.onIngredientClick, BakingDataFragment.onStepsClick {
-
 
     LinearLayout fragmentLayout;
     GridLayout gridMain;
@@ -27,24 +31,33 @@ public class MainActivity extends AppCompatActivity implements BakingDataFragmen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ButterKnife.bind(this);
-        setContentView(R.layout.activity_main);
+        try {
+            ButterKnife.bind(this);
+            setContentView(R.layout.activity_main);
+            Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+            setSupportActionBar(myToolbar);
+            getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
+            getSupportActionBar().setHomeButtonEnabled(true);
 
+            Intent intent = getIntent();
+            BakingData bakingData = intent.getParcelableExtra(RecipeWidgetFactory.BAKINGDATA);
 
-        Intent intent = getIntent();
+            mTwoPlane = findViewById(R.id.android_me_linear_layout) != null;
+            if (mTwoPlane) {
+                fragmentLayout = (LinearLayout) findViewById(R.id.fragment_layout);
+                gridMain = (GridLayout) findViewById(R.id.grid_main);
+            }
+            Fresco.initialize(this);
 
-        BakingData bakingData = intent.getParcelableExtra(ReceipeWidgetFactory.BAKINGDATA);
-
-        mTwoPlane = findViewById(R.id.android_me_linear_layout) != null;
-        if(mTwoPlane){
-            fragmentLayout= (LinearLayout) findViewById(R.id.fragment_layout);
-            gridMain= (GridLayout) findViewById(R.id.grid_main);
-        }
-
-        if (bakingData != null) {
-            onIngredientClick(bakingData, true);
-        } else if (savedInstanceState == null) {
-            loadReceipes();
+            if (bakingData != null) {
+                onIngredientClick(bakingData, true);
+            } else if (savedInstanceState == null) {
+                loadRecipes();
+            }
+            Intent msgIntent = new Intent(this, RecipeDataService.class);
+            startService(msgIntent);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -52,14 +65,13 @@ public class MainActivity extends AppCompatActivity implements BakingDataFragmen
     @Override
     protected void onResume() {
         super.onResume();
-        setTitle(getString(R.string.app_name));
     }
 
     protected void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
     }
 
-    private void loadReceipes() {
+    private void loadRecipes() {
         int containerId;
         if (mTwoPlane) {
             containerId = (R.id.grid_main);
@@ -70,12 +82,20 @@ public class MainActivity extends AppCompatActivity implements BakingDataFragmen
         }
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(containerId, new ReceipeFragment());
+        transaction.replace(containerId, new RecipeFragment());
         transaction.commit();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
-    public void loadReceipeDetail(BakingData mItem) {
+    public void loadRecipeDetail(BakingData mItem) {
         int containerId;
         if (mTwoPlane) {
             containerId = (R.id.master_list_fragment);
@@ -87,11 +107,11 @@ public class MainActivity extends AppCompatActivity implements BakingDataFragmen
         BakingDataFragment bakingDataFragment = new BakingDataFragment();
 
         Bundle bundle = new Bundle();
-        bundle.putParcelable(BakingDataFragment.RECEIPE, mItem);
+        bundle.putParcelable(BakingDataFragment.Recipe, mItem);
         bakingDataFragment.setArguments(bundle);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.addToBackStack(BakingDataFragment.RECEIPE);
+        transaction.addToBackStack(BakingDataFragment.Recipe);
         transaction.replace(containerId, bakingDataFragment);
         transaction.commit();
     }
@@ -134,12 +154,10 @@ public class MainActivity extends AppCompatActivity implements BakingDataFragmen
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        if (getFragmentManager().getBackStackEntryCount() > 0) {
-            getFragmentManager().popBackStack();
+        if (getSupportFragmentManager().getBackStackEntryCount() >= 1) {
+            getSupportFragmentManager().popBackStack();
         } else {
-            loadReceipes();
-            super.onBackPressed();
+            finish();
         }
     }
 }

@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import varunbehl.bakingappproject.R;
+import varunbehl.bakingappproject.activity.MainActivity;
 import varunbehl.bakingappproject.adapter.IngredientsRecyclerViewAdapter;
 import varunbehl.bakingappproject.pojo.BakingData;
 
@@ -36,7 +37,8 @@ public class IngredientsDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_bakingdataingredients_list, container, false);
-
+        ((MainActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
+        ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Bundle bundle;
         if (savedInstanceState == null) {

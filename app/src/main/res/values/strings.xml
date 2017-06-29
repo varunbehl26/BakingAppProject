@@ -2,7 +2,7 @@
     <string name="app_name">Baking App</string>
 
     <string name="appwidget_text">Baking App</string>
-    <string name="receipe">Receipe:</string>
+    <string name="Recipe">Recipe:</string>
     <string name="servings">Servings:</string>
     <string name="measure">Measure:</string>
     <string name="quantity">Quantity:</string>
@@ -10,7 +10,8 @@
     <string name="next_step">Next Step</string>
     <string name="recipe_ingredients">Recipe Ingredients</string>
     <string name="recipe_steps">Recipe Steps</string>
-    <string name="recip_wid">Receipe widget</string>
+    <string name="recip_wid">Recipe widget</string>
+    <string name="no_data_available">No data Available</string>
 
 
 </resources>

@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,18 +19,26 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".widget.ReceipeWidget">
+        <receiver android:name=".widget.RecipeWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/receipe_widget_info" />
+                android:resource="@xml/recipe_widget_info" />
         </receiver>
 
+
+        <receiver android:name=".fragment.RecipeFragment" />
+        <receiver android:name=".widget.RecipeWidgetFactory" />
+
         <service
-            android:name="varunbehl.bakingappproject.widget.ReceipeWidgetService"
+            android:name="varunbehl.bakingappproject.widget.RecipeWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
+        <service
+            android:name=".widget.RecipeDataService"
+            android:exported="false" />
+
     </application>
 
 </manifest>

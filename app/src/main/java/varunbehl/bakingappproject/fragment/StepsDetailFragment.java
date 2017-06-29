@@ -3,6 +3,7 @@ package varunbehl.bakingappproject.fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -33,8 +35,8 @@ import com.google.android.exoplayer2.util.Util;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import varunbehl.bakingappproject.MainActivity;
 import varunbehl.bakingappproject.R;
+import varunbehl.bakingappproject.activity.MainActivity;
 import varunbehl.bakingappproject.pojo.BakingData;
 
 public class StepsDetailFragment extends Fragment implements ExoPlayer.EventListener {
@@ -52,6 +54,9 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
     private SimpleExoPlayer player;
     private PlaybackStateCompat.Builder mStateBuilder;
     private int position;
+    private int playerWindow;
+    private boolean shouldRestorePosition;
+    private long playerPosition;
 
 
     public StepsDetailFragment() {
@@ -79,9 +84,27 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Timeline timeline = player.getCurrentTimeline();
+        if (timeline != null) {
+            playerWindow = player.getCurrentWindowIndex();
+            Timeline.Window window = timeline.getWindow(playerWindow, new Timeline.Window());
+            if (!window.isDynamic) {
+                shouldRestorePosition = true;
+                playerPosition = window.isSeekable ? player.getCurrentPosition() : C.TIME_UNSET;
+            }
+        }
+
+    }
+
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_bak, container, false);
+        ((MainActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
+        ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ButterKnife.bind(this, view);
 
         if (savedInstanceState == null) {
