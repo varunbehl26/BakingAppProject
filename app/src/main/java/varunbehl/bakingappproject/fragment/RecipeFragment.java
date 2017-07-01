@@ -115,12 +115,6 @@ public class RecipeFragment extends Fragment {
                 if (b != null) {
                     bakingDataList = b.getParcelableArrayList("RecipeData");
                 }
-//            } else {
-//                Gson gson = new Gson();
-//                String json = preferences.getString("RecipeObject", "");
-//                Type type = new TypeToken<List<BakingData>>() {}.getType();
-//                bakingDataList = gson.fromJson(json, type);
-//            }
             }
             if (bakingDataList != null && bakingDataList.isEmpty()) {
                 recyclerView.setVisibility(View.GONE);

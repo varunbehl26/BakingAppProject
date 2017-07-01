@@ -12,6 +12,7 @@
     <string name="recipe_steps">Recipe Steps</string>
     <string name="recip_wid">Recipe widget</string>
     <string name="no_data_available">No data Available</string>
+    <string name="recipe">Recipe</string>
 
 
 </resources>

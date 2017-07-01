@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -55,8 +54,7 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
     private PlaybackStateCompat.Builder mStateBuilder;
     private int position;
     private int playerWindow;
-    private boolean shouldRestorePosition;
-    private long playerPosition;
+    private long playerPosition = 0;
 
 
     public StepsDetailFragment() {
@@ -75,80 +73,100 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setRetainInstance(true);
         if (savedInstanceState == null) {
             bundle = this.getArguments();
         } else {
             bundle = savedInstanceState.getBundle(StepsDetailFragment.class.getName());
         }
     }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        Timeline timeline = player.getCurrentTimeline();
-        if (timeline != null) {
-            playerWindow = player.getCurrentWindowIndex();
-            Timeline.Window window = timeline.getWindow(playerWindow, new Timeline.Window());
-            if (!window.isDynamic) {
-                shouldRestorePosition = true;
-                playerPosition = window.isSeekable ? player.getCurrentPosition() : C.TIME_UNSET;
-            }
-        }
-
-    }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_bak, container, false);
-        ((MainActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
-        ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ButterKnife.bind(this, view);
+        try {
+            ((MainActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
+            ((MainActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            ButterKnife.bind(this, view);
 
-        if (savedInstanceState == null) {
-            bundle = this.getArguments();
-        } else {
-            bundle = savedInstanceState.getBundle(StepsDetailFragment.class.getName());
-        }
-
-        if (bundle != null) {
-            bakingData = bundle.getParcelable(STEPS);
-        }
-
-        getActivity().setTitle(bakingData.getName());
-        position = bundle.getInt(POSITION);
-
-        descriptionTx.setText(bakingData.getSteps().get(position).getDescription());
-        if (bakingData.getSteps().size() < position) {
-            nextStepBtn.setVisibility(View.GONE);
-        }
-
-        mPlayerView = (SimpleExoPlayerView) view.findViewById(R.id.playerView);
-        initializeMediaSession();
-
-        initializePlayer(Uri.parse(bakingData.getSteps().get(position).getVideoURL()));
-
-        final BakingData finalBakingData = bakingData;
-        nextStepBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((MainActivity) getContext()).onStepsClick(finalBakingData, position + 1);
-                player.setPlayWhenReady(false);
-
+            if (savedInstanceState == null) {
+                bundle = this.getArguments();
+            } else {
+                bundle = savedInstanceState.getBundle(StepsDetailFragment.class.getName());
             }
-        });
+
+            if (bundle != null) {
+                bakingData = bundle.getParcelable(STEPS);
+            }
+
+            getActivity().setTitle(bakingData.getName());
+            position = bundle.getInt(POSITION);
+
+            descriptionTx.setText(bakingData.getSteps().get(position).getDescription());
+            if (bakingData.getSteps().size() < position) {
+                nextStepBtn.setVisibility(View.GONE);
+            }
+
+            mPlayerView = (SimpleExoPlayerView) view.findViewById(R.id.playerView);
+            initializeMediaSession();
+
+            initializePlayer(Uri.parse(bakingData.getSteps().get(position).getVideoURL()));
+
+            final BakingData finalBakingData = bakingData;
+            nextStepBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((MainActivity) getContext()).onStepsClick(finalBakingData, position + 1);
+                    player.setPlayWhenReady(false);
+                }
+            });
 
 
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                hideSystemUI();
+                mPlayerView.getLayoutParams().height = ViewGroup.LayoutParams.MATCH_PARENT;
+                descriptionTx.setVisibility(View.GONE);
+                nextStepBtn.setVisibility(View.GONE);
+                player.seekTo(playerPosition);
+                player.setPlayWhenReady(true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return view;
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        releasePlayer();
+    private void hideSystemUI() {
+        getActivity().getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        player.setPlayWhenReady(false);
+        mMediaSession.setActive(false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mMediaSession.setActive(true);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        releasePlayer();
+        mMediaSession.setActive(false);
+    }
+
 
     public void releasePlayer() {
         player.stop();
@@ -201,18 +219,19 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
         if (player == null) {
             // Create an instance of the ExoPlayer.
             player = ExoPlayerFactory.newSimpleInstance(getContext(), new DefaultTrackSelector(), new DefaultLoadControl());
-
-            mPlayerView.setPlayer(player);
-
-            // Set the ExoPlayer.EventListener to this activity.
-            player.addListener(this);
-
-            // Prepare the MediaSource.
-            String userAgent = Util.getUserAgent(getContext(), "ClassicalMusicQuiz");
-            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
-            player.prepare(mediaSource);
-            player.setPlayWhenReady(true);
         }
+        mPlayerView.setPlayer(player);
+
+        // Set the ExoPlayer.EventListener to this activity.
+        player.addListener(this);
+
+        // Prepare the MediaSource.
+        String userAgent = Util.getUserAgent(getContext(), "ClassicalMusicQuiz");
+        MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
+        player.prepare(mediaSource);
+        player.seekTo(playerPosition);
+        player.setPlayWhenReady(true);
+
     }
 
 
@@ -243,15 +262,10 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        if ((playbackState == ExoPlayer.STATE_READY) && playWhenReady) {
-            mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
-                    player.getCurrentPosition(), 1f);
-        } else if ((playbackState == ExoPlayer.STATE_READY)) {
-            mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
-                    player.getCurrentPosition(), 1f);
+        if (playbackState == PlaybackStateCompat.STATE_PLAYING) {
+            playerPosition = (int) player.getCurrentPosition();
         }
         mMediaSession.setPlaybackState(mStateBuilder.build());
-//        showNotification(mStateBuilder.build());
     }
 
     @Override

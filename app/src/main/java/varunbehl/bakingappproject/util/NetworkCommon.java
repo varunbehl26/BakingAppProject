@@ -8,13 +8,14 @@ import android.net.NetworkInfo;
 public class NetworkCommon {
 
     public static boolean isConnected(Context context) {
+        boolean isConnected = false;
         try {
-            final ConnectivityManager conMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            final NetworkInfo activeNetwork = conMgr.getActiveNetworkInfo();
-            return activeNetwork != null && activeNetwork.getState() == NetworkInfo.State.CONNECTED;
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return true;
+        return isConnected;
     }
 }

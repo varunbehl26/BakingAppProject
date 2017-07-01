@@ -47,15 +47,17 @@ public class MainActivity extends AppCompatActivity implements BakingDataFragmen
                 fragmentLayout = (LinearLayout) findViewById(R.id.fragment_layout);
                 gridMain = (GridLayout) findViewById(R.id.grid_main);
             }
-            Fresco.initialize(this);
 
             if (bakingData != null) {
                 onIngredientClick(bakingData, true);
-            } else if (savedInstanceState == null) {
+            }
+
+            if (savedInstanceState == null) {
+                Fresco.initialize(this);
+                Intent msgIntent = new Intent(this, RecipeDataService.class);
+                startService(msgIntent);
                 loadRecipes();
             }
-            Intent msgIntent = new Intent(this, RecipeDataService.class);
-            startService(msgIntent);
         } catch (Exception e) {
             e.printStackTrace();
         }

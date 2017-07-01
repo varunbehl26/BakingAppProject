@@ -4,7 +4,6 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +51,7 @@ public class RecipeDataService extends IntentService {
 
                                    @Override
                                    public void onError(Throwable e) {
-                                       Log.v("Exception", e.toString());
+                                       e.printStackTrace();
                                    }
 
                                    @Override
