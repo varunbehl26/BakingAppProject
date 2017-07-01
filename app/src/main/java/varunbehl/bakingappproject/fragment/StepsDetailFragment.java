@@ -262,9 +262,7 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        if (playbackState == PlaybackStateCompat.STATE_PLAYING) {
-            playerPosition = (int) player.getCurrentPosition();
-        }
+        playerPosition = (int) player.getCurrentPosition();
         mMediaSession.setPlaybackState(mStateBuilder.build());
     }
 
