@@ -4,6 +4,11 @@ package varunbehl.bakingappproject.pojo;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class BakingData implements Parcelable {
@@ -24,18 +29,39 @@ public class BakingData implements Parcelable {
     private String name;
     private List<Ingredient> ingredients = null;
     private List<Step> steps = null;
-    private Integer servings;
+    private String servings;
     private String image;
 
     public BakingData() {
     }
+
+    public BakingData(JSONObject bake_jason) {
+        try {
+            this.name = bake_jason.getString("name");
+            this.ingredients = new ArrayList<>();
+            JSONArray ingredientsJA = bake_jason.getJSONArray("ingredients");
+            for (int i = 0; i < ingredientsJA.length(); i++) {
+                ingredients.add(new Ingredient(ingredientsJA.getJSONObject(i)));
+            }
+            this.steps = new ArrayList<>();
+            JSONArray stepsJA = bake_jason.getJSONArray("steps");
+            for (int i = 0; i < stepsJA.length(); i++) {
+                steps.add(new Step(stepsJA.getJSONObject(i)));
+            }
+            this.servings = bake_jason.getString("servings");
+            this.image = bake_jason.getString("image");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     protected BakingData(Parcel in) {
         this.id = (Integer) in.readValue(Integer.class.getClassLoader());
         this.name = in.readString();
         this.ingredients = in.createTypedArrayList(new Ingredient().CREATOR);
         this.steps = in.createTypedArrayList(new Step().CREATOR);
-        this.servings = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.servings = (String) in.readValue(String.class.getClassLoader());
         this.image = in.readString();
     }
 
@@ -71,11 +97,11 @@ public class BakingData implements Parcelable {
         this.steps = steps;
     }
 
-    public Integer getServings() {
+    public String getServings() {
         return servings;
     }
 
-    public void setServings(Integer servings) {
+    public void setServings(String servings) {
         this.servings = servings;
     }
 
@@ -131,6 +157,18 @@ public class BakingData implements Parcelable {
             this.description = in.readString();
             this.videoURL = in.readString();
             this.thumbnailURL = in.readString();
+        }
+
+        public Step(JSONObject step_jason) {
+            try {
+                this.id = step_jason.getInt("id");
+                this.shortDescription = step_jason.optString("shortDescription");
+                this.description = step_jason.optString("description");
+                this.videoURL = step_jason.optString("videoURL");
+                this.thumbnailURL = step_jason.getString("thumbnailURL");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         public Integer getId() {

@@ -13,11 +13,9 @@ import varunbehl.bakingappproject.activity.MainActivity;
 /**
  * Implementation of App Widget functionality.
  */
-public class RecipeWidget extends AppWidgetProvider {
+public class RecipeWidgetProvider extends AppWidgetProvider {
 
-    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId) {
-
+    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
 
         try {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.recipe_widget);
@@ -28,14 +26,11 @@ public class RecipeWidget extends AppWidgetProvider {
             Intent appIntent = new Intent(context, MainActivity.class);
             PendingIntent appPendingIntent = PendingIntent.getActivity(context, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             views.setPendingIntentTemplate(R.id.list_view, appPendingIntent);
-
             appWidgetManager.updateAppWidget(appWidgetId, views);
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.list_view);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 
     @Override

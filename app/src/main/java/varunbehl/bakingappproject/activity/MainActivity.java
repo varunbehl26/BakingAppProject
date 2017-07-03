@@ -4,10 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.GridLayout;
 import android.widget.LinearLayout;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -25,8 +25,8 @@ import varunbehl.bakingappproject.widget.RecipeWidgetFactory;
 public class MainActivity extends AppCompatActivity implements BakingDataFragment.onIngredientClick, BakingDataFragment.onStepsClick {
 
     LinearLayout fragmentLayout;
-    GridLayout gridMain;
     private boolean mTwoPlane;
+    private RecyclerView mainRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements BakingDataFragmen
             mTwoPlane = findViewById(R.id.android_me_linear_layout) != null;
             if (mTwoPlane) {
                 fragmentLayout = (LinearLayout) findViewById(R.id.fragment_layout);
-                gridMain = (GridLayout) findViewById(R.id.grid_main);
+                mainRecyclerView = (RecyclerView) findViewById(R.id.main_recycle);
             }
 
             if (bakingData != null) {
@@ -76,9 +76,9 @@ public class MainActivity extends AppCompatActivity implements BakingDataFragmen
     private void loadRecipes() {
         int containerId;
         if (mTwoPlane) {
-            containerId = (R.id.grid_main);
+            containerId = (R.id.main_recycle);
             fragmentLayout.setVisibility(View.GONE);
-            gridMain.setVisibility(View.VISIBLE);
+            mainRecyclerView.setVisibility(View.VISIBLE);
         } else {
             containerId = (R.id.container);
         }
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements BakingDataFragmen
         if (mTwoPlane) {
             containerId = (R.id.master_list_fragment);
             fragmentLayout.setVisibility(View.VISIBLE);
-            gridMain.setVisibility(View.GONE);
+            mainRecyclerView.setVisibility(View.GONE);
         } else {
             containerId = (R.id.container);
         }

@@ -3,6 +3,9 @@ package varunbehl.bakingappproject.pojo;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by varunbehl on 29/06/17.
  */
@@ -31,6 +34,16 @@ public class Ingredient implements Parcelable {
         this.quantity = (Double) in.readValue(Double.class.getClassLoader());
         this.measure = in.readString();
         this.ingredient = in.readString();
+    }
+
+    public Ingredient(JSONObject ingredient_jason) {
+        try {
+            this.quantity = ingredient_jason.getDouble("quantity");
+            this.measure = ingredient_jason.optString("measure");
+            this.ingredient = ingredient_jason.optString("ingredient");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public Double getQuantity() {

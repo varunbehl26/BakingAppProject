@@ -1,19 +1,28 @@
 package varunbehl.bakingappproject.widget;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import org.json.JSONArray;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import retrofit2.Call;
 import varunbehl.bakingappproject.R;
 import varunbehl.bakingappproject.pojo.BakingData;
 
@@ -21,14 +30,7 @@ public class RecipeWidgetFactory implements RemoteViewsService.RemoteViewsFactor
     public static String BAKINGDATA = "bakingData";
     private Context context = null;
     private List<BakingData> bakingDataList;
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // Get extra data included in the Intent
-            Bundle b = intent.getExtras();
-            bakingDataList = b.getParcelableArrayList("RecipeData");
-        }
-    };
+    private Call call;
 
     public RecipeWidgetFactory() {
     }
@@ -37,20 +39,20 @@ public class RecipeWidgetFactory implements RemoteViewsService.RemoteViewsFactor
     public RecipeWidgetFactory(Context applicationContext, Intent intent) {
         context = applicationContext;
         bakingDataList = new ArrayList<>();
-        context.registerReceiver(mMessageReceiver, new IntentFilter());
+
     }
 
     @Override
     public void onCreate() {
-
     }
 
     @Override
     public void onDataSetChanged() {
-        context.registerReceiver(
-                mMessageReceiver, new IntentFilter("bcNewMessage"));
-        Intent msgIntent = new Intent(context, RecipeDataService.class);
-        context.startService(msgIntent);
+        try {
+            new FetchBakingDatasTask().execute().get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -117,4 +119,62 @@ public class RecipeWidgetFactory implements RemoteViewsService.RemoteViewsFactor
     }
 
 
+    public class FetchBakingDatasTask extends AsyncTask<Void, Void, ArrayList<BakingData>> {
+
+        @Override
+        protected ArrayList<BakingData> doInBackground(Void... params) {
+
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            try {
+                Uri builtUri = Uri.parse(context.getString(R.string.URL))
+                        .buildUpon()
+                        .build();
+
+                URL url = new URL(builtUri.toString());
+
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line + "\n");
+                }
+                if (buffer.length() == 0) {
+                    return null;
+                }
+                JSONArray movieArray = new JSONArray(buffer.toString());
+                bakingDataList = new ArrayList<>();
+                for (int i = 0; i < movieArray.length(); i++) {
+                    bakingDataList.add(new BakingData(movieArray.getJSONObject(i)));
+                    Log.e("name: ", bakingDataList.get(i).getName());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (urlConnection != null) {
+                        urlConnection.disconnect();
+                    }
+                    if (reader != null) {
+                        reader.close();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return (ArrayList<BakingData>) bakingDataList;
+            }
+        }
+    }
 }
+
+

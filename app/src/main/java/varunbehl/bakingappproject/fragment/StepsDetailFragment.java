@@ -168,10 +168,19 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
     }
 
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        releasePlayer();
+        mMediaSession.setActive(false);
+    }
+
     public void releasePlayer() {
-        player.stop();
-        player.release();
-        player = null;
+        if (player != null) {
+            player.stop();
+            player.release();
+            player = null;
+        }
     }
 
     /**

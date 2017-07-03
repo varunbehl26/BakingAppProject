@@ -13,6 +13,7 @@
     <string name="recip_wid">Recipe widget</string>
     <string name="no_data_available">No data Available</string>
     <string name="recipe">Recipe</string>
+    <string name="URL">https://d17h27t6h515a5.cloudfront.net/topher/2017/March/58d1537b_baking/baking.json</string>
 
 
 </resources>

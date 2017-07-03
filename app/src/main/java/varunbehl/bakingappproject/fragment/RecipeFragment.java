@@ -108,7 +108,7 @@ public class RecipeFragment extends Fragment {
         try {
             preferences = getActivity().getSharedPreferences("Recipe", Context.MODE_PRIVATE);
             ButterKnife.bind(this, view);
-            progressBar.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
             ((MainActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.app_name));
             if (savedInstanceState != null) {
                 Bundle b = savedInstanceState.getBundle("bundle");
@@ -116,10 +116,12 @@ public class RecipeFragment extends Fragment {
                     bakingDataList = b.getParcelableArrayList("RecipeData");
                 }
             }
-            if (bakingDataList != null && bakingDataList.isEmpty()) {
+            if (bakingDataList == null) {
                 recyclerView.setVisibility(View.GONE);
                 emptyView.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
             } else {
+                progressBar.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
                 emptyView.setVisibility(View.GONE);
                 RecipeRecyclerViewAdapter RecipeAdapter = new RecipeRecyclerViewAdapter(bakingDataList, getContext());

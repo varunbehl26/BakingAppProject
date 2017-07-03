@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
+
 import varunbehl.bakingappproject.R;
 import varunbehl.bakingappproject.activity.MainActivity;
 import varunbehl.bakingappproject.pojo.BakingData;
@@ -30,13 +32,14 @@ public class StepsRecyclerViewAdapter extends RecyclerView.Adapter<StepsRecycler
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues;
         holder.description.setText(mValues.getSteps().get(position).getShortDescription());
+        holder.thumbnaiView.setImageURI(mValues.getSteps().get(position).getThumbnailURL());
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity) mContext).onStepsClick(mValues, position);
+                ((MainActivity) mContext).onStepsClick(mValues, holder.getAdapterPosition());
 
             }
         });
@@ -55,11 +58,14 @@ public class StepsRecyclerViewAdapter extends RecyclerView.Adapter<StepsRecycler
         public final View mView;
         public final TextView description;
         public BakingData mItem;
+        SimpleDraweeView thumbnaiView;
+
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
             description = (TextView) view.findViewById(R.id.description);
+            thumbnaiView = (SimpleDraweeView) view.findViewById(R.id.step_img);
         }
 
     }
