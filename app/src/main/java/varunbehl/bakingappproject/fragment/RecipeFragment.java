@@ -32,7 +32,7 @@ import varunbehl.bakingappproject.pojo.BakingData;
 
 public class RecipeFragment extends Fragment {
 
-    public static final String RecipeS = "RecipeFragment";
+    public static final String Recipe = "RecipeFragment";
     @BindView(R.id.empty_view)
     TextView emptyView;
     @BindView(R.id.recipe_recycler_view)
@@ -41,6 +41,7 @@ public class RecipeFragment extends Fragment {
     ProgressBar progressBar;
     private List<BakingData> bakingDataList;
     private SharedPreferences preferences;
+    private RecipeRecyclerViewAdapter recyclerViewAdapter;
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -61,10 +62,10 @@ public class RecipeFragment extends Fragment {
                 progressBar.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
                 emptyView.setVisibility(View.GONE);
-                RecipeRecyclerViewAdapter RecipeAdapter = new RecipeRecyclerViewAdapter(bakingDataList, getContext());
+                recyclerViewAdapter = new RecipeRecyclerViewAdapter(bakingDataList, getContext());
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                recyclerView.setAdapter(RecipeAdapter);
-                RecipeAdapter.notifyDataSetChanged();
+                recyclerView.setAdapter(recyclerViewAdapter);
+                recyclerViewAdapter.notifyDataSetChanged();
             }
         }
     };
@@ -93,7 +94,15 @@ public class RecipeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getActivity().registerReceiver(mMessageReceiver, new IntentFilter("bcNewMessage"));
-
+        if (bakingDataList == null) {
+            recyclerView.setVisibility(View.GONE);
+            emptyView.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+        } else {
+            progressBar.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -110,30 +119,28 @@ public class RecipeFragment extends Fragment {
             ButterKnife.bind(this, view);
             progressBar.setVisibility(View.VISIBLE);
             ((MainActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.app_name));
+            recyclerViewAdapter = new RecipeRecyclerViewAdapter(bakingDataList, getContext());
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            recyclerView.setAdapter(recyclerViewAdapter);
             if (savedInstanceState != null) {
                 Bundle b = savedInstanceState.getBundle("bundle");
                 if (b != null) {
                     bakingDataList = b.getParcelableArrayList("RecipeData");
                 }
+                if (bakingDataList == null) {
+                    recyclerView.setVisibility(View.GONE);
+                    emptyView.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    emptyView.setVisibility(View.GONE);
+                    recyclerViewAdapter.notifyDataSetChanged();
+                }
             }
-            if (bakingDataList == null) {
-                recyclerView.setVisibility(View.GONE);
-                emptyView.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.GONE);
-            } else {
-                progressBar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                emptyView.setVisibility(View.GONE);
-                RecipeRecyclerViewAdapter RecipeAdapter = new RecipeRecyclerViewAdapter(bakingDataList, getContext());
-                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                recyclerView.setAdapter(RecipeAdapter);
-                RecipeAdapter.notifyDataSetChanged();
-            }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return view;
     }
 

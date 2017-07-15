@@ -59,6 +59,8 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.7.0'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.facebook.fresco:fresco:1.1.0'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
 
 
 }

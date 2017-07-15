@@ -55,6 +55,7 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
     private int position;
     private int playerWindow;
     private long playerPosition = 0;
+    private Uri mediaUri;
 
 
     public StepsDetailFragment() {
@@ -110,8 +111,8 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
 
             mPlayerView = (SimpleExoPlayerView) view.findViewById(R.id.playerView);
             initializeMediaSession();
-
-            initializePlayer(Uri.parse(bakingData.getSteps().get(position).getVideoURL()));
+            mediaUri = Uri.parse(bakingData.getSteps().get(position).getVideoURL());
+            initializePlayer();
 
             final BakingData finalBakingData = bakingData;
             nextStepBtn.setOnClickListener(new View.OnClickListener() {
@@ -150,13 +151,15 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
     @Override
     public void onPause() {
         super.onPause();
-        player.setPlayWhenReady(false);
-        mMediaSession.setActive(false);
+        releasePlayer();
+
     }
+
 
     @Override
     public void onResume() {
         super.onResume();
+        initializePlayer();
         mMediaSession.setActive(true);
     }
 
@@ -178,10 +181,13 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
     public void releasePlayer() {
         if (player != null) {
             player.stop();
+            player.setPlayWhenReady(false);
+            mMediaSession.setActive(false);
             player.release();
             player = null;
         }
     }
+
 
     /**
      * Initializes the Media Session to be enabled with media buttons, transport controls, callbacks
@@ -219,12 +225,7 @@ public class StepsDetailFragment extends Fragment implements ExoPlayer.EventList
 
     }
 
-    /**
-     * Initialize ExoPlayer.
-     *
-     * @param mediaUri The URI of the sample to play.
-     */
-    private void initializePlayer(Uri mediaUri) {
+    private void initializePlayer() {
         if (player == null) {
             // Create an instance of the ExoPlayer.
             player = ExoPlayerFactory.newSimpleInstance(getContext(), new DefaultTrackSelector(), new DefaultLoadControl());

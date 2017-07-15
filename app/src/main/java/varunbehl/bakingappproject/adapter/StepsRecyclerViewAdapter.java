@@ -35,7 +35,8 @@ public class StepsRecyclerViewAdapter extends RecyclerView.Adapter<StepsRecycler
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues;
         holder.description.setText(mValues.getSteps().get(position).getShortDescription());
-        holder.thumbnaiView.setImageURI(mValues.getSteps().get(position).getThumbnailURL());
+        if (mValues.getSteps().get(position).getThumbnailURL() != null)
+            holder.thumbnaiView.setImageURI(mValues.getSteps().get(position).getThumbnailURL());
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
